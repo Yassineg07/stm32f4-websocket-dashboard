@@ -40,14 +40,14 @@ This project implements an LED control system using STM32F407VG microcontroller 
 ### 1. WiFi Settings
 Update in `esp8266.h`:
 ```c
-#define WIFI_SSID           "YourWiFiNetworkName"
-#define WIFI_PASSWORD       "YourWiFiPassword"
+#define WIFI_SSID           "YOUR-WIFI-NAME"
+#define WIFI_PASSWORD       "YOUR-WiFi-Password"
 ```
 
 ### 2. MQTT Broker Settings
 Update in both `esp8266.h` and `server.js`:
 ```c
-#define MQTT_BROKER_IP      "192.168.1.29"  // Your server IP
+#define MQTT_BROKER_IP      "192.168.1.100"  // Your server IP
 #define MQTT_BROKER_PORT    1883
 ```
 
