@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STM32 LED Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        #onBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #offBtn {
+            background-color: #f44336;
+            color: white;
+        }
+        #status {
+            margin: 20px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #ledState {
+            display: inline-block;
+            width: 60px;
+            text-align: center;
+        }
+        #connectionStatus {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .connected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .disconnected {
+            background-color: #f44336;
+            color: white;
+        }
+        .led-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            flex-shrink: 0;
+        }
+        .led-on {
+            background-color: #00ff00;
+            box-shadow: 0 0 15px #00ff00;
+        }
+        .led-off {
+            background-color: #ff0000;
+            box-shadow: 0 0 15px #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>STM32 LED Control</h1>
+        
+        <div>
+            <button id="onBtn">Turn ON</button>
+            <button id="offBtn">Turn OFF</button>
+        </div>
+        
+        <div id="status">
+            LED Status: <span id="ledState">Unknown</span>
+            <span id="ledIndicator" class="led-indicator led-off"></span>
+        </div>
+        
+        <div>
+            WebSocket: 
+            <span id="connectionStatus" class="disconnected">Disconnected</span>
+        </div>
+    </div>
+
+    <script>
+        // Connect to WebSocket server
+        const ws = new WebSocket(`ws://${window.location.hostname}:3000`);
+
+        // UI Elements
+        const onBtn = document.getElementById('onBtn');
+        const offBtn = document.getElementById('offBtn');
+        const ledState = document.getElementById('ledState');
+        const ledIndicator = document.getElementById('ledIndicator');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        // Handle WebSocket connection
+        ws.onopen = () => {
+            console.log('WebSocket connected');
+            connectionStatus.textContent = 'Connected';
+            connectionStatus.className = 'connected';
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket disconnected');
+            connectionStatus.textContent = 'Disconnected';
+            connectionStatus.className = 'disconnected';
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('Received message:', data); // Debug log
+            
+            if (data.type === 'led_state') {
+                console.log('LED state message:', data.state); // Debug log
+                
+                // Parse the LED state from STM32 format "LED: ON" or "LED: OFF"
+                let ledStatus = data.state.toLowerCase();
+                
+                // Check if it contains "on" or "off"
+                if (ledStatus.includes('on')) {
+                    ledStatus = 'on';
+                } else if (ledStatus.includes('off')) {
+                    ledStatus = 'off';
+                } else {
+                    ledStatus = 'unknown';
+                }
+                
+                console.log('Parsed LED status:', ledStatus); // Debug log
+                
+                // Update LED status text
+                ledState.textContent = ledStatus.toUpperCase();
+                
+                // Update LED indicator
+                if (ledStatus === 'on') {
+                    ledIndicator.className = 'led-indicator led-on';
+                    console.log('Setting LED indicator to GREEN'); // Debug log
+                } else if (ledStatus === 'off') {
+                    ledIndicator.className = 'led-indicator led-off';
+                    console.log('Setting LED indicator to RED'); // Debug log
+                }
+            }
+        };
+
+        // Button event handlers
+        onBtn.addEventListener('click', () => {
+            ws.send(JSON.stringify({ type: 'control', state: 'on' }));
+        });
+
+        offBtn.addEventListener('click', () => {
+            ws.send(JSON.stringify({ type: 'control', state: 'off' }));
+        });
+    </script>
+</body>
+</html>
