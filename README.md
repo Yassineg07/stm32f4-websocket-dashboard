@@ -12,20 +12,18 @@ This project implements an LED control system using STM32F407VG microcontroller 
 
 - STM32F407VG Discovery Board
 - ESP8266 WiFi Module (ESP-01 or similar)
-- LED connected to pin PC9
+- LED connected to pin PD15
 - UART connection between STM32 and ESP8266:
   - STM32 USART2 (PA2/PA3) connected to ESP8266 RX/TX
   - ESP8266 VCC to 3.3V
   - ESP8266 GND to GND
-  - ESP8266 CH_PD to 3.3V
-  - ESP8266 RST to 3.3V (optional pull-up)
 
 ## Software Components
 
 ### 1. STM32 Firmware
 - **main.c**: Main application logic
 - **esp8266.h/esp8266.c**: ESP8266 driver with AT command interface
-- **GPIO Configuration**: PC9 as output for LED control
+- **GPIO Configuration**: PD15 as output for LED control
 - **UART Configuration**: USART2 at 115200 baud for ESP8266 communication
 
 ### 2. Node.js WebSocket Server
@@ -59,9 +57,8 @@ Update in both `esp8266.h` and `server.js`:
 
 ### 1. Hardware Setup
 1. Connect ESP8266 to STM32 USART2 (PA2/PA3)
-2. Connect LED to PC9 with appropriate current limiting resistor
+2. An integrated blue LED is already connected to PD15 pin
 3. Power ESP8266 with 3.3V (ensure stable power supply)
-4. Connect CH_PD and RST pins to 3.3V
 
 ### 2. Software Setup
 1. **STM32 Configuration**:
