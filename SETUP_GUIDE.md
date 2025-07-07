@@ -4,13 +4,13 @@
 
 1. **Update WiFi Credentials** in `Core/Inc/esp8266.h`:
    ```c
-   #define WIFI_SSID           "YourActualWiFiName"
-   #define WIFI_PASSWORD       "YourActualWiFiPassword"
+   #define WIFI_SSID           "YOUR-WIFI-NAME"
+   #define WIFI_PASSWORD       "YOUR-WiFi-PASSWORD"
    ```
 
 2. **Update MQTT Broker IP** in `Core/Inc/esp8266.h`:
    ```c
-   #define MQTT_BROKER_IP      "192.168.1.29"  // Replace with your computer's IP
+   #define MQTT_BROKER_IP      "192.168.1.100"  // Replace with your computer's IP
    ```
 
 3. **Install MQTT Broker** (if not already installed):
@@ -31,11 +31,9 @@ PA2 (USART2_TX) ---> RX
 PA3 (USART2_RX) <--- TX
 3.3V            ---> VCC
 GND             ---> GND
-3.3V            ---> CH_PD
-3.3V            ---> RST (optional)
 
 LED Connection:
-PC9 ---> LED ---> 220Ω Resistor ---> GND
+PD15 is an integrated blue LED in stm32f407g-disc1 board
 ```
 
 ### Step 2: Start MQTT Broker
