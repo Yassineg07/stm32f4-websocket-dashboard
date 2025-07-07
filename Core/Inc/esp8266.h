@@ -37,11 +37,11 @@ typedef enum {
 #define ESP8266_BUFFER_SIZE         512
 
 /* WiFi Configuration */
-#define WIFI_SSID                   "TOPNET_5528"
-#define WIFI_PASSWORD               "rm5dx7h9yl"
+#define WIFI_SSID                   "YOUR-WIFI"
+#define WIFI_PASSWORD               "YOUR-PASSWORD"
 
 /* MQTT Configuration */
-#define MQTT_BROKER_IP              "192.168.1.29"
+#define MQTT_BROKER_IP              "192.168.1.100" //YOUR BROKER ID
 #define MQTT_BROKER_PORT            1883
 #define MQTT_CLIENT_ID              "STM32_LED_Controller"
 #define MQTT_TOPIC_LED_CONTROL      "led/control"
