@@ -19,7 +19,7 @@ const server = app.listen(port, () => {
 const wss = new WebSocket.Server({ server });
 
 // Connect to MQTT Broker (replace with your broker IP)
-const mqttClient = mqtt.connect('mqtt://192.168.1.29'); 
+const mqttClient = mqtt.connect('mqtt://192.168.1.100'); // CHANGE TO YOUR IP ADRESSE HERE!!
 
 // Store connected WebSocket clients
 const clients = new Set();
