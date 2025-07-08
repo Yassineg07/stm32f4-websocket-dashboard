@@ -1,0 +1,8 @@
+../Core/Src/main.c:84:5:main	7
+../Core/Src/main.c:160:6:SystemClock_Config	3
+../Core/Src/main.c:201:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:232:13:MX_DMA_Init	1
+../Core/Src/main.c:253:13:MX_GPIO_Init	1
+../Core/Src/main.c:287:6:LED_Control	2
+../Core/Src/main.c:307:6:ESP8266_OnMQTTMessageReceived	9
+../Core/Src/main.c:332:6:Error_Handler	1

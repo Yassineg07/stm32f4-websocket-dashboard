@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STM32 LED Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        /* Toggle Switch Styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 80px;
+            height: 40px;
+            margin: 20px 0;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 32px;
+            width: 32px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        input:checked + .slider {
+            background-color: #4CAF50;
+            box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px #4CAF50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(40px);
+        }
+        
+        /* Switch Labels */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .switch-label {
+            font-weight: bold;
+            font-size: 16px;
+            color: #666;
+            transition: color 0.3s;
+        }
+        
+        .switch-label.active {
+            color: #4CAF50;
+        }
+        
+        .switch-label.off {
+            color: #f44336;
+        }
+        #status {
+            margin: 20px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #ledState {
+            display: inline-block;
+            width: 60px;
+            text-align: center;
+        }
+        #connectionStatus {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .connected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .disconnected {
+            background-color: #f44336;
+            color: white;
+        }
+        .led-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            flex-shrink: 0;
+        }
+        .led-on {
+            background-color: #00ff00;
+            box-shadow: 0 0 15px #00ff00;
+        }
+        .led-off {
+            background-color: #ff0000;
+            box-shadow: 0 0 15px #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>STM32 LED Control</h1>
+        
+        <div class="switch-container">
+            <span id="offLabel" class="switch-label off">OFF</span>
+            <label class="switch">
+                <input type="checkbox" id="ledSwitch">
+                <span class="slider"></span>
+            </label>
+            <span id="onLabel" class="switch-label">ON</span>
+        </div>
+        
+        <div id="status">
+            LED Status: <span id="ledState">Unknown</span>
+            <span id="ledIndicator" class="led-indicator led-off"></span>
+        </div>
+        
+        <div>
+            WebSocket: 
+            <span id="connectionStatus" class="disconnected">Disconnected</span>
+        </div>
+    </div>
+
+    <script>
+        // Connect to WebSocket server
+        const ws = new WebSocket(`ws://192.168.1.16:3000`);
+
+        // UI Elements
+        const ledSwitch = document.getElementById('ledSwitch');
+        const onLabel = document.getElementById('onLabel');
+        const offLabel = document.getElementById('offLabel');
+        const ledState = document.getElementById('ledState');
+        const ledIndicator = document.getElementById('ledIndicator');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        // Handle WebSocket connection
+        ws.onopen = () => {
+            console.log('WebSocket connected');
+            connectionStatus.textContent = 'Connected';
+            connectionStatus.className = 'connected';
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket disconnected');
+            connectionStatus.textContent = 'Disconnected';
+            connectionStatus.className = 'disconnected';
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('Received message:', data); // Debug log
+            
+            if (data.type === 'led_state') {
+                console.log('LED state message:', data.state); // Debug log
+                
+                // Parse the LED state from STM32 format "LED: ON" or "LED: OFF"
+                let ledStatus = data.state.toLowerCase();
+                
+                // Check if it contains "on" or "off"
+                if (ledStatus.includes('on')) {
+                    ledStatus = 'on';
+                } else if (ledStatus.includes('off')) {
+                    ledStatus = 'off';
+                } else {
+                    ledStatus = 'unknown';
+                }
+                
+                console.log('Parsed LED status:', ledStatus); // Debug log
+                
+                // Update LED status text
+                ledState.textContent = ledStatus.toUpperCase();
+                
+                // Update switch position (without triggering event)
+                ledSwitch.checked = (ledStatus === 'on');
+                updateSwitchLabels(ledStatus === 'on');
+                
+                // Update LED indicator
+                if (ledStatus === 'on') {
+                    ledIndicator.className = 'led-indicator led-on';
+                    console.log('Setting LED indicator to GREEN'); // Debug log
+                } else if (ledStatus === 'off') {
+                    ledIndicator.className = 'led-indicator led-off';
+                    console.log('Setting LED indicator to RED'); // Debug log
+                }
+            }
+        };
+
+        // Function to update switch label colors
+        function updateSwitchLabels(isOn) {
+            if (isOn) {
+                onLabel.className = 'switch-label active';
+                offLabel.className = 'switch-label';
+            } else {
+                onLabel.className = 'switch-label';
+                offLabel.className = 'switch-label off';
+            }
+        }
+
+        // Switch event handler
+        ledSwitch.addEventListener('change', () => {
+            const isOn = ledSwitch.checked;
+            const command = isOn ? 'on' : 'off';
+            
+            // Update label colors immediately for responsive feel
+            updateSwitchLabels(isOn);
+            
+            // Send command to STM32
+            ws.send(JSON.stringify({ type: 'control', state: command }));
+            
+            console.log(`Switch toggled: ${command}`);
+        });
+    </script>
+</body>
+</html>
