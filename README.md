@@ -118,6 +118,10 @@ Open your browser and navigate to:
 - Local: `http://localhost:3000`
 - Network: `http://YOUR_PC_IP:3000`
 
+![Screenshot 2025-07-09 200109](https://github.com/user-attachments/assets/d77ef094-3dbb-4685-89d1-01eec8bb28d5)
+![Screenshot 2025-07-09 195935](https://github.com/user-attachments/assets/8a4613fb-2db9-48be-994a-e35975303787)
+![Screenshot 2025-07-09 195605](https://github.com/user-attachments/assets/4abec64d-a7d5-4a0d-8711-014837fdba11)
+
 ## 🌟 Features
 
 ### STM32 Firmware Features
